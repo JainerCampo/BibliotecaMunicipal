@@ -1,1 +1,1 @@
-Este proyecto fue realizado para apreder java POO by JainerCampo
+Este proyecto fue realizado para aprender java POO 
