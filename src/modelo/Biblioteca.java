@@ -7,14 +7,16 @@ public class Biblioteca {
     private ArrayList<Libro> libros;
     private ArrayList<Usuario> usuarios;
     private ArrayList<Prestamo> prestamos;
-    private ArrayList<Autor> autores;   
+    private ArrayList<Autor> autores;
+    private ArrayList<Multa> multas;   
     
     public Biblioteca(String nombre) {
         this.nombre = nombre;
         this.libros = new ArrayList<>();
         this.usuarios = new ArrayList<>();
         this.prestamos = new ArrayList<>();
-        this.autores = new ArrayList<>();       
+        this.autores = new ArrayList<>();
+        this.multas = new ArrayList<>();
     }
     public String getNombre() {
         return nombre;
@@ -98,16 +100,8 @@ public class Biblioteca {
     }
 
     //metodo asignar autor a libro
-    public boolean asignarAutorALibro(String tituloLibro, String nombreAutor) {    
-        Libro libro = buscarLibro(tituloLibro);
-        if (libro == null) {
-            return false; // El libro no existe
-        }
-        Autor autor = buscarAutor(nombreAutor);
-        if (autor == null) {
-            return false; // El autor no existe
-        }
-        return libro.agregarAutor(autor);
+    public void asignarAutorALibro(Libro libro, Autor autor) {    
+        libro.agregarAutor(autor);
     }
 
     // metodo buscar libro
@@ -130,26 +124,13 @@ public class Biblioteca {
         return null;
     }
     
-    // metodo prestar libro
-   public String prestarLibro( String tituloLibro, String codigoUsuario, String fechaPrestamo, String fechaDevolucion){       
-        // verificar si el libro existe 
-        Libro libro = buscarLibro(tituloLibro);
-        if (libro == null) {
-                return "Libro no encontrado"; 
-            }
-        // verificar si hay ejemplares disponibles
-        if (libro.getEjemplaresDisponibles() <= 0) {
-                return "No hay ejemplares disponibles";
-            }   
-        // verificar si el usuario existe
-        Usuario usuario = buscarUsuario(codigoUsuario);
-            if (usuario == null) {
-                return "Usuario no encontrado"; 
-            }
-        Prestamo prestamo = new Prestamo(libro, usuario, fechaPrestamo, fechaDevolucion);
+    // metodo asignar prestamo a usuario
+   public boolean prestarLibro( int id, Libro libro, Usuario usuario, String fechaPrestamo, String fechaDevolucion){       
+
+        Prestamo prestamo = new Prestamo(id, libro, usuario, fechaPrestamo, fechaDevolucion);
         libro.disminuirEjemplaresDisponibles();    
         prestamos.add(prestamo);
-        return "Préstamo realizado con éxito";
+        return true;
     }
 
     //metodo mostrar libros
@@ -190,5 +171,60 @@ public class Biblioteca {
         return resultado;
     }
     
+    //metodo buscar prestamo
+    public Prestamo buscarPrestamo(int idPrestamo) {
+        for (Prestamo prestamo : prestamos) {
+            if (prestamo.getId() == idPrestamo) {
+                return prestamo;
+            }
+        }
+        return null; // El préstamo no existe
+    }  
+
+    //metodo asignar prestamo a usuario
+    public void asignarPrestamoAUsuario(Prestamo prestamo, Usuario usuario) {
+        usuario.agregarPrestamo(prestamo);
+    }
+
+    // metodo mostrar multas
+    public String mostrarMultas() {
+        if (multas.isEmpty()) {
+            return "No hay multas registradas en la biblioteca.";
+        }
+        String resultado = "";
+        for (Multa multa : multas) {
+            resultado += multa.descripcion() + "\n";
+        }
+        return resultado;
+    }
+
+    // metodo agregar multa
+    public void agregarMulta(Multa multa) {
+        multas.add(multa);
+    }
     
+    // metodo asignar multa a usuario
+    public static void asignarMultaUsuario(Multa multa, Usuario usuario){
+        usuario.agregarMulta(multa);
+    }
+
+    //metodo buscar multa
+    public Multa buscarMulta(int id) {
+        for (Multa multa : multas) {
+            if (multa.getId() == id) {
+                return multa;
+            }
+        }
+        return null; // La multa no existe
+    }
+
+    //metodo eliminar multa
+    public boolean eliminarMulta(int id) {
+        Multa multaEncontrada = buscarMulta(id);
+        if (multaEncontrada != null) {
+            multas.remove(multaEncontrada);
+            return true; // Multa eliminada exitosamente
+        }
+        return false; // La multa no existe
+    }
 }
